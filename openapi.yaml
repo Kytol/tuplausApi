@@ -1,0 +1,168 @@
+openapi: 3.0.0
+info:
+  title: Tuplaus API
+  description: API for managing user funds and game state in a Doubling game.
+  version: "1.0.0"
+servers:
+  - url: https://wobblypaint.com/api
+    description: Main API server
+paths:
+  /get-funds:
+    get:
+      summary: Get current funds of a user
+      operationId: getFunds
+      tags:
+        - Funds
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved balance
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  balance:
+                    type: number
+                    example: 100
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+  /add-funds:
+    post:
+      summary: Add funds to a user's account
+      operationId: addFunds
+      tags:
+        - Funds
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                deposit:
+                  type: number
+                  example: 50
+      responses:
+        '200':
+          description: Funds added successfully
+        '500':
+          description: Internal server error
+  /withdraw-funds:
+    post:
+      summary: Withdraw funds from a user's account
+      operationId: withdrawFunds
+      tags:
+        - Funds
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                withdrawAmount:
+                  type: number
+                  example: 50
+      responses:
+        '200':
+          description: Funds withdrawn successfully
+        '400':
+          description: Not enough funds
+        '500':
+          description: Internal server error
+  /toggle-playing-mode:
+    post:
+      summary: Toggle the playing mode for a user
+      operationId: togglePlayingMode
+      tags:
+        - Game State
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Playing mode toggled successfully
+        '500':
+          description: Internal server error
+  /double:
+    post:
+      summary: Double a bet based on the choice
+      operationId: doubleBet
+      tags:
+        - Game State
+      security:
+        - bearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                choice:
+                  type: string
+                  description: User's choice, either 'big' or 'small'
+                  example: "big"
+                bet:
+                  type: number
+                  description: Amount of the bet
+                  example: 20
+      responses:
+        '200':
+          description: Doubling processed successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Doubling processed successfully"
+                  result:
+                    type: number
+                    example: 40
+        '404':
+          description: User not found
+        '500':
+          description: Internal server error
+
+  /user-info:
+    get:
+      summary: Retrieve user information
+      operationId: getUserInfo
+      tags:
+        - User
+      security:
+        - bearerAuth: []
+      responses:
+        '200':
+          description: Successfully retrieved user information
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uid:
+                    type: string
+                    example: "user123"
+                  balance:
+                    type: number
+                    example: 100
+                  isPlaying:
+                    type: boolean
+                    example: false
+        '500':
+          description: Internal server error
+components:
+  securitySchemes:
+    bearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
